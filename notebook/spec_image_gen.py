@@ -13,7 +13,8 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 import skimage.io
 import re
-from IPython.display import display, Image
+# from IPython.display import display, Image
+from PIL import Image
 # %matplotlib inline
 from sklearn.model_selection import train_test_split
 from pydub import AudioSegment
@@ -91,24 +92,9 @@ def mfcc(data):
     return librosa.feature.mfcc(y=data, sr=RATE, n_fft=FRAME_SIZE, hop_length=HOP_LEGTH)
 
 
-def create_and_save(data, op, dim):
-    _fig, ax = plt.figure(figsize=(dim, dim), frameon=False)
-    image = librosa.display.specshow(data, ax=ax, sr=RATE, y_axis='linear')
-    # ax.axes.get_xaxis().set_visible(False)
-    # ax.axes.get_yaxis().set_visible(False)
-    # ax.set_frame_on(False)
-    # ax.set_xlabel(None)
-    # ax.set_ylabel(None)
-    plt.jet()
-    _fig.savefig(f'{op}/{emo}-{i}.png')
-    plt.cla()
-    plt.close(_fig)
-    plt.close("all")
-
-
 def create_images_from_feature(df: pd.DataFrame, op, dim):
 
-    # _fig, ax = plt.subplots(1, figsize=(dim, dim))
+    _fig, ax = plt.subplots(1, figsize=(dim, dim))
     for i, row in tqdm(df.iterrows(), total=len(df)):
         # audio = preprocess(row['File_Path'])
         try:
@@ -121,19 +107,20 @@ def create_images_from_feature(df: pd.DataFrame, op, dim):
             print('Skipped:', row['File_Path'])
             continue
 
-        create_and_save(data, op, dim)
+        # Image.fromarray(np.uint8(cm.plasma(data)*255)
+        #                 ).save(f'{op}/{emo}-{i}.png')
 
-    #     image = librosa.display.specshow(data, ax=ax, sr=RATE, y_axis='linear')
-    #     ax.axes.get_xaxis().set_visible(False)
-    #     ax.axes.get_yaxis().set_visible(False)
-    #     ax.set_frame_on(False)
-    #     ax.set_xlabel(None)
-    #     ax.set_ylabel(None)
-    #     plt.jet()
-    #     # _fig.savefig(f'{op}/{emo}-{i}.png', bbox_inches='tight', pad_inches=0)
-    #     plt.cla()
-    # plt.close(_fig)
-    # plt.close("all")
+        image = librosa.display.specshow(data, ax=ax, sr=RATE, y_axis='linear')
+        ax.axes.get_xaxis().set_visible(False)
+        ax.axes.get_yaxis().set_visible(False)
+        ax.set_frame_on(False)
+        ax.set_xlabel(None)
+        ax.set_ylabel(None)
+        plt.jet()
+        _fig.savefig(f'{op}/{emo}-{i}.png', bbox_inches='tight', pad_inches=0)
+        plt.cla()
+    plt.close(_fig)
+    plt.close("all")
 
 
 # Building Dataframe
