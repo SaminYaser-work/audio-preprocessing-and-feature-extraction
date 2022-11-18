@@ -21,11 +21,13 @@ class data_loader:
     CLASS7 = ['angry', 'disgust', 'fear',
               'happy', 'neutral', 'sad', 'surprise']
 
-    def __init__(self, Crema_path, Ravdess_path, Savee_path, Tess_path):
+    def __init__(self, Crema_path, Ravdess_path, Savee_path, Tess_path, Banglaser_path, Subesco_path):
         self.Crema_Path = Crema_path
         self.Ravdess_Path = Ravdess_path
         self.Savee_Path = Savee_path
         self.Tess_Path = Tess_path
+        self.Banglaser_path = Banglaser_path
+        self.Subesco_path = Subesco_path
 
     def get_crema_df(self):
         crema = []
@@ -106,7 +108,40 @@ class data_loader:
         Tess_df.rename(columns={0: 'Emotion', 1: 'File_Path'}, inplace=True)
         return Tess_df
 
-    def get_all_df(self):
+    def get_banglaser_df(self):
+        files = []
+        emo = []
+        for dirpath, _, filenames in os.walk(self.Banglaser_path):
+            for filename in filenames:
+                files.append(os.path.join(dirpath, filename))
+                i = filename.split('-')[2]
+                if i == '01':
+                    x = 'happy'
+                elif i == '02':
+                    x = 'sad'
+                elif i == '03':
+                    x = 'angry'
+                elif i == '04':
+                    x = 'surprise'
+                elif i == '05':
+                    x = 'neutral'
+                else:
+                    raise ValueError('Invalid label in Banglaser...')
+                emo.append(x)
+        return pd.DataFrame({'File_Path': files, 'Emotion': emo})
+
+    def get_subesco_df(self):
+        files = []
+        emo = []
+        for dirpath, _, filenames in os.walk(self.Subesco_path):
+            for filename in filenames:
+                x = os.path.join(dirpath, filename)
+                files.append(x)
+                y = x.split('_')[-2].lower()
+                emo.append(y)
+        return pd.DataFrame({'File_Path': files, 'Emotion': emo})
+
+    def get_all_en_df(self):
         Crema_df = self.get_crema_df()
         Tess_df = self.get_tess_df()
         Ravdess_df = self.get_ravdess_df()
@@ -118,6 +153,37 @@ class data_loader:
         Savee_df['Database'] = ['savee'] * Savee_df.shape[0]
 
         main_df = pd.concat([Crema_df, Ravdess_df, Savee_df, Tess_df], axis=0)
+
+        return main_df
+
+    def get_all_bn_df(self):
+        Subesco_df = self.get_subesco_df()
+        Banglaser_df = self.get_banglaser_df()
+
+        Subesco_df['Database'] = ['subesco'] * Subesco_df.shape[0]
+        Banglaser_df['Database'] = ['banglaser'] * Banglaser_df.shape[0]
+
+        main_df = pd.concat([Subesco_df, Banglaser_df], axis=0)
+
+        return main_df
+
+    def get_all_df(self):
+        Crema_df = self.get_crema_df()
+        Tess_df = self.get_tess_df()
+        Ravdess_df = self.get_ravdess_df()
+        Savee_df = self.get_savee_df()
+        Subesco_df = self.get_subesco_df()
+        Banglaser_df = self.get_banglaser_df()
+
+        Subesco_df['Database'] = ['subesco'] * Subesco_df.shape[0]
+        Banglaser_df['Database'] = ['banglaser'] * Banglaser_df.shape[0]
+        Crema_df['Database'] = ['crema'] * Crema_df.shape[0]
+        Tess_df['Database'] = ['tess'] * Tess_df.shape[0]
+        Ravdess_df['Database'] = ['ravdess'] * Ravdess_df.shape[0]
+        Savee_df['Database'] = ['savee'] * Savee_df.shape[0]
+
+        main_df = pd.concat([Crema_df, Ravdess_df, Savee_df,
+                            Tess_df, Subesco_df, Banglaser_df], axis=0)
 
         return main_df
 
@@ -156,7 +222,7 @@ class data_loader:
 
         return train_data, train_label, val_data, val_label, test_data, test_label
 
-    def split_df(self, d: pd.DataFrame, ratio_train=0.7, ratio_val=0.15, ratio_test=0.15):
+    def split_df(self, d: pd.DataFrame, ratio_train=0.7, ratio_val=0.10, ratio_test=0.20):
 
         if ratio_train + ratio_val + ratio_test != 1:
             raise ValueError('Train, validation and test ratios must sum to 1')
