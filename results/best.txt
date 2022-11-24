@@ -1,0 +1,20 @@
+all: [1024, 512], 0.5, 'adam', 0.0001,
+
+
+With Aug:
+
+ravdess: [1024, 512], 0.5, 'adam', 1e-05,
+savee: [512], 0, 'adam', 1e-05,
+
+
+yamnet:
+
+ravdess: [2048], 0.2, 'adamax', 1e-05
+savee: [1024], 0.5, 'adam', 0.001
+tess: [2048], 0.5, 'adamax', 0.001,
+bser: [4096], 0, 'adamax', 1e-05,
+cream: [4096], 0, 'adamax', 1e-05,
+subesco: [4096, 2048], 0.5, 'adamax', 1e-05
+all_en:
+all_bn:
+all:
