@@ -15,6 +15,6 @@ tess: [2048], 0.5, 'adamax', 0.001,
 bser: [4096], 0, 'adamax', 1e-05,
 cream: [4096], 0, 'adamax', 1e-05,
 subesco: [4096, 2048], 0.5, 'adamax', 1e-05
-all_en:
-all_bn:
-all:
+all_en: [4096], 0, 'adamax', 0.0001
+all_bn: [4096, 2048], 0.2, 'adamax',0.0001
+all: [4096, 2048, 1024], 0.2, 'adamax', 0.001
